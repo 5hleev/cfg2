@@ -54,3 +54,24 @@ def generate_png(input_file, output_file, visualizer_path):
     """
     command = [visualizer_path, '-i', input_file, '-o', output_file]
     subprocess.run(command, check=True)
+
+def main_tool(visualizer_path, package_name, output_file, repo_url):
+    # Эмуляция поиска pom.xml
+    pom_file = os.path.join(repo_url, 'pom.xml')
+
+    if not os.path.exists(pom_file):
+        raise FileNotFoundError("pom.xml not found in the specified repository.")
+
+    with open(pom_file, 'r') as f:
+        pom_content = f.read()
+
+    dependencies = parse_maven_dependencies(pom_content)
+    mermaid_graph = build_mermaid_graph(dependencies)
+    temp_mermaid_file = 'graph.mmd'
+
+    save_mermaid_to_file(mermaid_graph, temp_mermaid_file)
+
+    # Запуск генерации PNG с правильным путем к mmdc
+    generate_png(temp_mermaid_file, output_file, visualizer_path)
+
+    print("Graph visualization successfully saved to", output_file)
