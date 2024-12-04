@@ -47,3 +47,10 @@ def save_mermaid_to_file(mermaid_graph, output_file):
     """
     with open(output_file, 'w') as f:
         f.write(mermaid_graph)
+
+def generate_png(input_file, output_file, visualizer_path):
+    """
+    Генерирует PNG-файл из Mermaid-файла с помощью указанного инструмента.
+    """
+    command = [visualizer_path, '-i', input_file, '-o', output_file]
+    subprocess.run(command, check=True)
