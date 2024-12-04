@@ -26,3 +26,24 @@ def parse_maven_dependencies(pom_content):
             dependencies[dep_key] = dependency_relations.get(dep_key, [])
 
     return dependencies
+
+def build_mermaid_graph(dependencies):
+    """
+    Создает Mermaid-граф из зависимостей с явными связями.
+    """
+    mermaid = ["graph TD"]
+    for dep, sub_deps in dependencies.items():
+        if not sub_deps:
+            mermaid.append(f"    {dep}")  # Если нет подзависимостей
+        else:
+            for sub_dep in sub_deps:
+                mermaid.append(f"    {dep} --> {sub_dep}")  # Указываем зависимость (стрелку)
+    return "\n".join(mermaid)
+
+
+def save_mermaid_to_file(mermaid_graph, output_file):
+    """
+    Сохраняет Mermaid-граф в текстовом файле.
+    """
+    with open(output_file, 'w') as f:
+        f.write(mermaid_graph)
