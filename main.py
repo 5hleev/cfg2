@@ -75,3 +75,46 @@ def main_tool(visualizer_path, package_name, output_file, repo_url):
     generate_png(temp_mermaid_file, output_file, visualizer_path)
 
     print("Graph visualization successfully saved to", output_file)
+
+class TestDependencyVisualizer(TestCase):
+
+    def test_parse_maven_dependencies(self):
+        pom_content = """<project><dependencies>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>example-artifact</artifactId>
+        </dependency>
+        </dependencies></project>"""
+        result = parse_maven_dependencies(pom_content)
+        self.assertEqual(result, {"org.example:example-artifact": []})
+
+    def test_build_mermaid_graph(self):
+        dependencies = {"org.example:example-artifact": []}
+        result = build_mermaid_graph(dependencies)
+        expected = """graph TD
+    org.example:example-artifact"""
+        self.assertEqual(result.strip(), expected.strip())
+
+    def test_save_mermaid_to_file(self):
+        mermaid_graph = "graph TD\n    A --> B"
+        temp_file = "test.mmd"
+        save_mermaid_to_file(mermaid_graph, temp_file)
+        with open(temp_file, 'r') as f:
+            content = f.read()
+        self.assertEqual(content, mermaid_graph)
+        os.remove(temp_file)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Java Dependency Graph Visualizer")
+    parser.add_argument("--visualizer_path", required=True, help="Path to the graph visualizer tool")
+    parser.add_argument("--package_name", required=True, help="Name of the package to analyze")
+    parser.add_argument("--output_file", required=True, help="Path to the output PNG file")
+    parser.add_argument("--repo_url", required=True, help="URL of the repository")
+
+    args = parser.parse_args()
+
+    try:
+        main_tool(args.visualizer_path, args.package_name, args.output_file, args.repo_url)
+    except Exception as e:
+        print("Error:", e)
